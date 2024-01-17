@@ -25,10 +25,14 @@ jobs:
         run: |
           cd $GITHUB_WORKFLOW
           docker build \
-          --tag ghcr.io/$GITHUB_ACTOR/$GITHUB_WORKFLOW:latest \
           --tag ghcr.io/$GITHUB_ACTOR/$GITHUB_WORKFLOW:$(echo $GITHUB_SHA | head -c7) \
+          --tag ghcr.io/$GITHUB_ACTOR/$GITHUB_WORKFLOW:latest \
+          --label=org.opencontainers.image.source=https://github.com/hkcomori/dockerfiles \
+          --label=org.opencontainers.image.description="Privoxy distroless image" \
+          --label=org.opencontainers.image.revision=$(echo $GITHUB_SHA) \
+          --label=org.opencontainers.image.licenses=MIT \
           .
       - name: Push Docker Image
         run: |
-          docker push ghcr.io/$GITHUB_ACTOR/$GITHUB_WORKFLOW:latest
           docker push ghcr.io/$GITHUB_ACTOR/$GITHUB_WORKFLOW:$(echo $GITHUB_SHA | head -c7)
+          docker push ghcr.io/$GITHUB_ACTOR/$GITHUB_WORKFLOW:latest
