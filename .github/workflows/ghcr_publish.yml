@@ -1,0 +1,55 @@
+name: Publish docker image to GitHub Container Registry
+
+on:
+  workflow_call:
+    inputs:
+      path:
+        required: true
+        type: string
+      description:
+        required: true
+        type: string
+      revision:
+        required: true
+        type: string
+      username:
+        required: true
+        type: string
+    secrets:
+      password:
+        required: true
+
+jobs:
+  publish_docker_image:
+    runs-on: ubuntu-latest
+    env:
+      DOCKERFILE_DIR: ${{ inputs.path }}
+      IMG_NAME: ghcr.io/${{ inputs.username }}/${{ inputs.path }}
+      IMG_DESCRIPTION: ${{ inputs.description }}
+      IMG_REVISION: ${{ inputs.revision }}
+      IMG_REPO: https://github.com/${{ github.repository }}
+      IMG_README: https://github.com/${{ github.repository }}/blob/main/${{ inputs.path }}/README.md
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ inputs.username }}
+          password: ${{ secrets.password }}
+      - name: Build Docker Image
+        run: |
+          cd $DOCKERFILE_DIR
+          docker build \
+          --tag $IMG_NAME:$IMG_REVISION \
+          --tag $IMG_NAME:latest \
+          --label=org.opencontainers.image.source="$IMG_REPO" \
+          --label=org.opencontainers.image.documentation="$IMG_README" \
+          --label=org.opencontainers.image.description="$IMG_DESCRIPTION" \
+          --label=org.opencontainers.image.revision=$IMG_REVISION \
+          --label=org.opencontainers.image.licenses=MIT \
+          .
+      - name: Push Docker Image
+        run: |
+          docker push $IMG_NAME:$IMG_REVISION
+          docker push $IMG_NAME:latest
