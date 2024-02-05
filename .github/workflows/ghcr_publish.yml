@@ -15,6 +15,14 @@ on:
       username:
         required: true
         type: string
+      tag:
+        default: "latest"
+        required: false
+        type: string
+      dockerfile:
+        default: "Dockerfile"
+        required: false
+        type: string
     secrets:
       password:
         required: true
@@ -24,7 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKERFILE_DIR: ${{ inputs.path }}
+      DOCKERFILE_NAME: ${{ inputs.dockerfile }}
       IMG_NAME: ghcr.io/${{ inputs.username }}/${{ inputs.path }}
+      IMG_TAG: ${{ inputs.tag }}
       IMG_DESCRIPTION: ${{ inputs.description }}
       IMG_REVISION: ${{ inputs.revision }}
       IMG_REPO: https://github.com/${{ github.repository }}
@@ -42,7 +52,8 @@ jobs:
           cd $DOCKERFILE_DIR
           docker build \
           --tag $IMG_NAME:$IMG_REVISION \
-          --tag $IMG_NAME:latest \
+          --tag $IMG_NAME:$IMG_TAG \
+          --file $DOCKERFILE_NAME \
           --label=org.opencontainers.image.source="$IMG_REPO" \
           --label=org.opencontainers.image.documentation="$IMG_README" \
           --label=org.opencontainers.image.description="$IMG_DESCRIPTION" \
@@ -52,4 +63,4 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push $IMG_NAME:$IMG_REVISION
-          docker push $IMG_NAME:latest
+          docker push $IMG_NAME:$IMG_TAG
