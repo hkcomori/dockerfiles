@@ -1,0 +1,37 @@
+name: github-cli
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'github-cli/**'
+
+jobs:
+  publish_to_ghcr_slim:
+    uses: ./.github/workflows/ghcr_publish.yml
+    with:
+      description: "GitHub CLI"
+      path: ${{ github.workflow }}
+      revision: ${{ github.sha }}-slim
+      username: ${{ github.actor }}
+      tag: slim
+      dockerfile: Dockerfile-slim
+    secrets:
+      password: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      packages: write
+
+  publish_to_ghcr_latest:
+    needs: publish_to_ghcr_slim
+    uses: ./.github/workflows/ghcr_publish.yml
+    with:
+      description: "GitHub CLI"
+      path: ${{ github.workflow }}
+      revision: ${{ github.sha }}
+      username: ${{ github.actor }}
+    secrets:
+      password: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      packages: write

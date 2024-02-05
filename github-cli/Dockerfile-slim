@@ -1,0 +1,24 @@
+FROM debian:12-slim AS build-env
+
+ENV DEBCONF_NOWARNINGS=yes
+
+RUN apt-get update \
+    && apt-get install --no-install-suggests --no-install-recommends --yes \
+        curl ca-certificates \
+    && apt-get -y clean \
+    && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update \
+    && apt-get install --no-install-suggests --no-install-recommends --yes \
+        gh
+
+FROM gcr.io/distroless/static-debian12
+
+COPY --from=build-env \
+    /usr/bin/gh \
+    /usr/bin/
+
+ENTRYPOINT ["/usr/bin/gh"]
+CMD ["auth", "status"]
