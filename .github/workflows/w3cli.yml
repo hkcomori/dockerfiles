@@ -1,0 +1,22 @@
+name: w3cli
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'w3cli/**'
+
+jobs:
+  publish_to_ghcr:
+    uses: ./.github/workflows/ghcr_publish.yml
+    with:
+      description: "the w3 command line interface"
+      path: ${{ github.workflow }}
+      revision: ${{ github.sha }}
+      username: ${{ github.actor }}
+    secrets:
+      password: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      packages: write
