@@ -1,0 +1,24 @@
+name: certbot
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'certbot/**'
+
+jobs:
+  publish_to_ghcr_dynu:
+    uses: ./.github/workflows/ghcr_publish.yml
+    with:
+      description: "Certbot with dns-dynu plugin"
+      path: ${{ github.workflow }}
+      revision: ${{ github.sha }}-dynu
+      username: ${{ github.actor }}
+      tag: dynu
+      dockerfile: Dockerfile-dynu
+    secrets:
+      password: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      packages: write
