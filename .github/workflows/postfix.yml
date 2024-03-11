@@ -1,0 +1,22 @@
+name: postfix
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'postfix/**'
+
+jobs:
+  publish_to_ghcr_latest:
+    uses: ./.github/workflows/ghcr_publish.yml
+    with:
+      description: "Postfix forked from catatnight/postfix"
+      path: ${{ github.workflow }}
+      revision: ${{ github.sha }}
+      username: ${{ github.actor }}
+    secrets:
+      password: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      packages: write
