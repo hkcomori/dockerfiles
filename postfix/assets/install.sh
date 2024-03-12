@@ -21,6 +21,10 @@ postconf -e maillog_file=/dev/stdout
 postconf -e myhostname=$maildomain
 postconf -F '*/*/chroot = n'
 
+if [[ -d /opt/postconf.d ]]; then
+  run-parts -v --exit-on-error --regex '.+$' /opt/postconf.d
+fi
+
 ############
 # SASL SUPPORT FOR CLIENTS
 # The following options set parameters needed by Postfix to enable
