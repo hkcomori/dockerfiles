@@ -11,21 +11,13 @@ cat > /etc/supervisor/conf.d/supervisord.conf <<EOF
 nodaemon=true
 
 [program:postfix]
-command=/opt/postfix.sh
-
-[program:rsyslog]
-command=/usr/sbin/rsyslogd -n -c3
+command=/usr/sbin/postfix start-fg
 EOF
 
 ############
 #  postfix
 ############
-cat >> /opt/postfix.sh <<EOF
-#!/bin/bash
-service postfix start
-tail -f /var/log/mail.log
-EOF
-chmod +x /opt/postfix.sh
+postconf -e maillog_file=/dev/stdout
 postconf -e myhostname=$maildomain
 postconf -F '*/*/chroot = n'
 
