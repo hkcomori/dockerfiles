@@ -12,6 +12,10 @@ nodaemon=true
 
 [program:postfix]
 command=/usr/sbin/postfix start-fg
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
 EOF
 
 ############
@@ -75,6 +79,10 @@ cat >> /etc/supervisor/conf.d/supervisord.conf <<EOF
 
 [program:opendkim]
 command=/usr/sbin/opendkim -f
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
 EOF
 # /etc/postfix/main.cf
 postconf -e milter_protocol=2
