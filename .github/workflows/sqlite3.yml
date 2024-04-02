@@ -1,0 +1,24 @@
+name: sqlite3
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'sqlite3/**'
+
+jobs:
+  publish_to_ghcr:
+    uses: ./.github/workflows/ghcr_publish.yml
+    with:
+      description: "SQLite3"
+      path: ${{ github.workflow }}
+      revision: ${{ github.sha }}
+      username: ${{ github.actor }}
+      tag: latest
+      dockerfile: Dockerfile
+    secrets:
+      password: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      packages: write
