@@ -1,0 +1,24 @@
+name: quartz
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'quartz/**'
+
+jobs:
+  publish_to_ghcr:
+    uses: ./.github/workflows/ghcr_publish.yml
+    with:
+      description: "Quartz"
+      path: ${{ github.workflow }}
+      revision: ${{ github.sha }}
+      username: ${{ github.actor }}
+      tag: v4
+      dockerfile: Dockerfile
+    secrets:
+      password: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      packages: write
